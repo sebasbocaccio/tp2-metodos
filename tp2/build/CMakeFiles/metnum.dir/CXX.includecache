@@ -1735,6 +1735,10 @@ iostream
 -
 knn.h
 /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/knn.h
+iostream
+-
+fstream
+-
 
 /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/knn.h
 types.h

@@ -111,10 +111,15 @@ Ejecutar la primera celda del notebook `knn.ipynb` o seguir los siguientes pasos
 
 - Compilar el código C++ en un módulo de python
 ```
+cd ../
 mkdir build
 cd build
 rm -rf *
 cmake -DPYTHON_EXECUTABLE="$(which python)" -DCMAKE_BUILD_TYPE=Release ..
+make install
+cd ../
+cd notebook
+jupyter-notebook
 ```
 - Al ejecutar el siguiente comando se compila e instala la librería en el directorio `notebooks`
 ```

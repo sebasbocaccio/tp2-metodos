@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+using namespace std;
 
 
 class KNNClassifier {
@@ -11,4 +12,6 @@ public:
 
     Vector predict(Matrix X);
 private:
+    unsigned int _n_neighbors;
+    int nearest_element_index( vector<tuple<double ,int > > arr, int l, int r, double x);
 };
