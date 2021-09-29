@@ -1605,6 +1605,8 @@ pca.h
 /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/pca.h
 eigen.h
 /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/eigen.h
+knn.h
+/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/knn.h
 
 /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/pca.cpp
 iostream

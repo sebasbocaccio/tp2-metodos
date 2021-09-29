@@ -37,32 +37,106 @@ void KNNClassifier::fit(Matrix X, Matrix y)
 Vector KNNClassifier::predict(Matrix X)
 {
 
+
+    vector<tuple<double,int>> images_norm;
     double norm;
     int digit;
-    vector<tuple<double,int>> images_norm;
-
+    std::ofstream outfile ("resultados.txt");
     std::ifstream infile("images_squaredNorm_sorted.txt");
     while (infile >> norm >> digit)
     {
         images_norm.push_back(make_tuple(norm,digit));
     }
     infile.close();
-    this->nearest_element_index(images_norm,0,images_norm.size()-1,10.0);
 
     // Creamos vector columna a devolver
     auto ret = Vector(X.rows());
+    
     for (unsigned k = 0; k < X.rows(); ++k)
     {
-        // Consigo su norma 
-        // Encuentro donde esta parado.
-        // Encuentro los k mas cercanos
-        // Me fijo cual tiene mayoria
-        // Pongo en vector 
-    }
+        outfile << 'Vector' << k << std::endl;
 
+        // Consigo su norma 
+        auto image_pixels = Eigen::VectorXd(X.cols());
+            for (unsigned j = 0; j < X.cols(); ++j){
+                image_pixels[j] = X(k,j);
+                }
+        double norma = image_pixels.squaredNorm();
+
+        // Encuentro donde esta parado.
+        outfile << '9' << '9'<< '9' << std::endl;
+        outfile << norma << std::endl;
+        int nearest_index = this->nearest_element_index(images_norm,0,images_norm.size()-1,norma);
+
+        // Encuentro los k mas cercanos
+        map<int,int> occurrences;
+        occurrences[0] = 0;
+        occurrences[1] = 0;
+        occurrences[2] = 0;
+        occurrences[3] = 0;
+        occurrences[4] = 0;
+        occurrences[5] = 0;
+        occurrences[6] = 0;
+        occurrences[7] = 0;
+        occurrences[8] = 0;
+        occurrences[9] = 0;
+
+        int lower_index = nearest_index - 1;
+        int above_index = nearest_index + 1;
+        int n_neighbors_counted = 1 ;
+        occurrences[get<1>(images_norm[nearest_index])] = 1 ;
+        outfile << get<1>(images_norm[nearest_index]) << std::endl;
+        while(n_neighbors_counted < this->_n_neighbors){
+
+            if(lower_index < 0 && above_index > images_norm.size()){break;}
+            else if(lower_index < 0){
+                occurrences[get<1>(images_norm[above_index])] = occurrences[get<1>(images_norm[above_index])] + 1;
+                outfile << get<1>(images_norm[above_index]) << std::endl;
+
+                above_index++;
+            }
+            else if(above_index > images_norm.size()){
+                occurrences[get<1>(images_norm[lower_index])] = occurrences[get<1>(images_norm[lower_index])] + 1;
+                outfile << get<1>(images_norm[lower_index]) << std::endl;
+                lower_index--;
+            }
+            else{
+                outfile << ":" << lower_index << ' ' <<get<0>(images_norm[lower_index]) << ' ' << abs(get<0>(images_norm[lower_index])-norma) << ' ' << above_index << ' ' <<get<0>(images_norm[above_index]) << ' ' << abs(get<0>(images_norm[above_index])-norma) << std::endl;
+                if(abs(get<0>(images_norm[lower_index])-norma) < abs(get<0>(images_norm[above_index])-norma)){
+                    occurrences[get<1>(images_norm[lower_index])] = occurrences[get<1>(images_norm[lower_index])] + 1;
+                    outfile << get<1>(images_norm[lower_index]) << std::endl;
+                    lower_index--;
+                }
+                else{
+                    occurrences[get<1>(images_norm[above_index])] = occurrences[get<1>(images_norm[above_index])] + 1;
+                    outfile << get<1>(images_norm[above_index]) << std::endl;
+                    above_index++;
+
+                }
+            }
+            n_neighbors_counted++;
+        }
+        outfile << n_neighbors_counted << std::endl;
+
+        // Me fijo cual tiene mayoria
+        int max_index = 0;
+        int max_occurrences = 0 ;
+        for(int i=0;i<=9;i++){
+            if(occurrences[i] > max_occurrences){
+                max_index = i;
+                max_occurrences=occurrences[i];
+            }
+        }
+        for(int i=0;i<=9;i++){
+            outfile << i << ':'<< occurrences[i] << std::endl;
+        }
+        // Pongo en vector
+        ret(k) = max_index;
+    }
+    outfile.close();
     return ret;
 
-    
+
 }
 
 
@@ -76,8 +150,6 @@ int KNNClassifier::nearest_element_index( vector<tuple<double ,int >> arr, int l
     int counter = 0 ;
     while (l <= r && counter < 100) {
         counter++;
-
-        cout << m <<endl;
         m = l + (r - l) / 2;
         outfile << m << std::endl;
 

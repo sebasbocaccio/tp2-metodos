@@ -8,7 +8,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
     message("Debug mode")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -O0")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+
 ENDIF()
 
 IF(CMAKE_BUILD_TYPE MATCHES Release)
