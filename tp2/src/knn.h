@@ -10,8 +10,7 @@ public:
     KNNClassifier(unsigned int n_neighbors);
 
     void fit(Matrix X, Matrix y);
-
-    int nearest_element_index( vector<tuple<double ,int > > arr, int l, int r, double x);
+    std::vector<tuple<Eigen::VectorXd, int>> retrieve_matrix_from_file(string file);
 
     Vector predict(Matrix X);
 private:

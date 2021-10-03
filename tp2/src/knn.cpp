@@ -40,32 +40,8 @@ std::pair<KeyType, ValueType> get_max(const std::map<KeyType, ValueType> &x) {
 }
 
 Vector KNNClassifier::predict(Matrix X) {
-    std::ifstream ifs("manolo1.txt");
-    std::vector<tuple<Eigen::VectorXd, int>> imagenes;
-    int number;
-    string line;// Get number of images
-    std::getline(ifs, line);
-    stringstream iss(line);
-    uint cols;
-    uint rows;
 
-    iss >> rows;
-    iss >> cols;
-    // Get images
-    for (unsigned i = 0; i < rows; ++i) {
-        std::getline(ifs, line);
-        stringstream iss(line);
-        auto image_pixels = Eigen::VectorXd(X.cols());
-        for (unsigned k = 0; k < cols; ++k) {
-            iss >> number;
-            image_pixels[k] = number;
-        }
-        int category;
-        iss >> category;
-        imagenes.push_back(make_tuple(image_pixels, category));
-    }
-
-    ifs.close();
+    std::vector<tuple<Eigen::VectorXd, int>> imagenes = this->retrieve_matrix_from_file("manolo1.txt");
     vector<tuple<double, int>> images_norm;
     auto ret = Vector(X.rows());
     for (unsigned k = 0; k < X.rows(); ++k) {
@@ -81,7 +57,7 @@ Vector KNNClassifier::predict(Matrix X) {
             double norma = image_pixels.squaredNorm();
             images_norm.push_back(make_tuple(norma, get<1>(copy_imagenes[i])));
         }
-        // Sorteo por errores y devuelvo los primeros k. 
+        // Sorteo por errores y devuelvo los primeros k.
         sort(images_norm.begin(), images_norm.end());
 
         // Encuentro los k mas cercanos
@@ -107,3 +83,31 @@ Vector KNNClassifier::predict(Matrix X) {
     return ret;
 }
 
+std::vector<tuple<Eigen::VectorXd, int>> KNNClassifier::retrieve_matrix_from_file(string file){
+    std::ifstream ifs(file);
+    std::vector<tuple<Eigen::VectorXd, int>> imagenes;
+    int number;
+    string line;// Get number of images
+    std::getline(ifs, line);
+    stringstream iss(line);
+    uint cols;
+    uint rows;
+
+    iss >> rows;
+    iss >> cols;
+    // Get images
+    for (unsigned i = 0; i < rows; ++i) {
+        std::getline(ifs, line);
+        stringstream iss(line);
+        auto image_pixels = Eigen::VectorXd(cols);
+        for (unsigned k = 0; k < cols; ++k) {
+            iss >> number;
+            image_pixels[k] = number;
+        }
+        int category;
+        iss >> category;
+        imagenes.push_back(make_tuple(image_pixels, category));
+    }
+    ifs.close();
+    return imagenes;
+}
