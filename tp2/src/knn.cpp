@@ -15,7 +15,7 @@ KNNClassifier::KNNClassifier(unsigned int n_neighbors) {
 
 void KNNClassifier::fit(Matrix X, Matrix y) {
     vector<tuple<double, int>> images_norm;
-    std::ofstream outfile("manolo1.txt");
+    std::ofstream outfile("imagenes.txt");
     outfile << X.rows() << ' ' << X.cols() << std::endl;
     for (unsigned k = 0; k < X.rows(); ++k) {
         auto image_pixels = Eigen::VectorXd(X.cols());
@@ -40,7 +40,7 @@ std::pair<KeyType, ValueType> get_max(const std::map<KeyType, ValueType> &x) {
 }
 
 Vector KNNClassifier::predict(Matrix X) {
-    std::vector<tuple<Eigen::VectorXd, int>> imagenes = this->retrieve_matrix_from_file("manolo1.txt");
+    std::vector<tuple<Eigen::VectorXd, int>> imagenes = this->retrieve_matrix_from_file("imagenes.txt");
     auto prediccion_categoria = Vector(X.rows());
     for (unsigned k = 0; k < X.rows(); ++k) {
         vector<tuple<double, int>> vecinos_ordenados = this->neighbours_sorted_by_distance(X, imagenes,k);
