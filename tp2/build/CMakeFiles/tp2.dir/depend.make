@@ -915,7 +915,6 @@ CMakeFiles/tp2.dir/src/main.cpp.o: ../eigen/Eigen/src/plugins/ReshapedMethods.h
 CMakeFiles/tp2.dir/src/main.cpp.o: ../src/eigen.h
 CMakeFiles/tp2.dir/src/main.cpp.o: ../src/knn.h
 CMakeFiles/tp2.dir/src/main.cpp.o: ../src/main.cpp
-CMakeFiles/tp2.dir/src/main.cpp.o: ../src/pca.h
 CMakeFiles/tp2.dir/src/main.cpp.o: ../src/types.h
 
 CMakeFiles/tp2.dir/src/pca.cpp.o: ../eigen/Eigen/Cholesky

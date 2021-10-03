@@ -916,7 +916,6 @@ CMakeFiles/tp2.dir/src/main.cpp.o
  /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/eigen.h
  /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/knn.h
  /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/main.cpp
- /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/pca.h
  /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/types.h
 CMakeFiles/tp2.dir/src/pca.cpp.o
  ../eigen/Eigen/Cholesky

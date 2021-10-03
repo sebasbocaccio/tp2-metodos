@@ -3,7 +3,7 @@
 #include "knn.h"
 #include "pca.h"
 #include "eigen.h"
-
+#include <fstream>
 namespace py=pybind11;
 
 // el primer argumento es el nombre...
@@ -11,8 +11,8 @@ PYBIND11_MODULE(metnum, m) {
     py::class_<KNNClassifier>(m, "KNNClassifier")
         .def(py::init<unsigned int>())
         .def("fit", &KNNClassifier::fit)
-        .def("predict", &KNNClassifier::predict)
-        .def("nearest_element_index",&KNNClassifier::nearest_element_index);
+        .def("predict", &KNNClassifier::predict);
+
 
     py::class_<PCA>(m, "PCA")
         .def(py::init<unsigned int>())

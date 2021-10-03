@@ -2,74 +2,90 @@
 //#include <chrono>
 #include <iostream>
 #include "knn.h"
+#include <fstream>
 
 using namespace std;
-#include <iostream>
-#include <fstream>  
 
-KNNClassifier::KNNClassifier(unsigned int n_neighbors)
-{
-    this->_n_neighbors= n_neighbors;
+#include <iostream>
+#include <fstream>
+
+KNNClassifier::KNNClassifier(unsigned int n_neighbors) {
+    this->_n_neighbors = n_neighbors;
 }
 
-void KNNClassifier::fit(Matrix X, Matrix y)
-{
-    vector<tuple<double,int>> images_norm;
-    std::ofstream outfile ("images_squaredNorm_sorted.txt");
-
-    for (unsigned k = 0; k < X.rows(); ++k){
-        auto image_pixels = Eigen::VectorXd(X.cols()); 
-       for (unsigned j = 0; j < X.cols(); ++j){
-            image_pixels[j] = X(k,j);
-       }
+void KNNClassifier::fit(Matrix X, Matrix y) {
+    vector<tuple<double, int>> images_norm;
+    std::ofstream outfile("manolo1.txt");
+    outfile << X.rows() << ' ' <<  X.cols() << std::endl;
+    for (unsigned k = 0; k < X.rows(); ++k) {
+        auto image_pixels = Eigen::VectorXd(X.cols());
+        for (unsigned j = 0; j < X.cols(); ++j) {
+            image_pixels[j] = X(k, j);
+            outfile << image_pixels[j] << ' ';
+        }
+        outfile << y(k, 0) << std::endl;
         images_norm.push_back(make_tuple(image_pixels.squaredNorm(), y(k,0)));
     }
-    sort(images_norm.begin(), images_norm.end());
-    for (long unsigned int i = 0; i < images_norm.size(); i++) 
-        outfile << get<0>(images_norm[i]) << ' ' <<  get<1>(images_norm[i]) << std::endl;
 
     outfile.close();
 
 }
 
+template<typename KeyType, typename ValueType>
+std::pair<KeyType, ValueType> get_max(const std::map<KeyType, ValueType> &x) {
+    using pairtype = std::pair<KeyType, ValueType>;
+    return *std::max_element(x.begin(), x.end(), [](const pairtype &p1, const pairtype &p2) {
+        return p1.second < p2.second;
+    });
+}
 
+Vector KNNClassifier::predict(Matrix X) {
+    std::ifstream ifs("manolo1.txt");
+    std::vector<tuple<Eigen::VectorXd, int>> imagenes;
+    int number;
+    string line;// Get number of images
+    std::getline(ifs, line);
+    stringstream iss(line);
+    uint cols;
+    uint rows;
 
-Vector KNNClassifier::predict(Matrix X)
-{
-
-
-    vector<tuple<double,int>> images_norm;
-    double norm;
-    int digit;
-    std::ofstream outfile ("resultados.txt");
-    std::ifstream infile("images_squaredNorm_sorted.txt");
-    while (infile >> norm >> digit)
-    {
-        images_norm.push_back(make_tuple(norm,digit));
-    }
-    infile.close();
-
-    // Creamos vector columna a devolver
-    auto ret = Vector(X.rows());
-    
-    for (unsigned k = 0; k < X.rows(); ++k)
-    {
-        outfile << 'Vector' << k << std::endl;
-
-        // Consigo su norma 
+    iss >> rows;
+    iss >> cols;
+    // Get images
+    for (unsigned i = 0; i < rows; ++i) {
+        std::getline(ifs, line);
+        stringstream iss(line);
         auto image_pixels = Eigen::VectorXd(X.cols());
-            for (unsigned j = 0; j < X.cols(); ++j){
-                image_pixels[j] = X(k,j);
-                }
-        double norma = image_pixels.squaredNorm();
+        for (unsigned k = 0; k < cols; ++k) {
+            iss >> number;
+            image_pixels[k] = number;
+        }
+        int category;
+        iss >> category;
+        imagenes.push_back(make_tuple(image_pixels, category));
+    }
 
-        // Encuentro donde esta parado.
-        outfile << '9' << '9'<< '9' << std::endl;
-        outfile << norma << std::endl;
-        int nearest_index = this->nearest_element_index(images_norm,0,images_norm.size()-1,norma);
+    ifs.close();
+    vector<tuple<double, int>> images_norm;
+    auto ret = Vector(X.rows());
+    for (unsigned k = 0; k < X.rows(); ++k) {
+
+        std::vector<tuple<Eigen::VectorXd, int>> copy_imagenes = imagenes;
+        // Hago la diferencia
+        for (int i = 0; i < imagenes.size(); i++) {
+            auto image_pixels = Eigen::VectorXd(X.cols());
+            for (unsigned j = 0; j < X.cols(); ++j) {
+                double numero = get<0>(copy_imagenes[i])[j] - X(k, j);
+                image_pixels[j] = numero;
+            }
+            double norma = image_pixels.squaredNorm();
+            images_norm.push_back(make_tuple(norma, get<1>(copy_imagenes[i])));
+        }
+        // Sorteo por errores y devuelvo los primeros k. 
+        sort(images_norm.begin(), images_norm.end());
 
         // Encuentro los k mas cercanos
-        map<int,int> occurrences;
+        map<int, int> occurrences;
         occurrences[0] = 0;
         occurrences[1] = 0;
         occurrences[2] = 0;
@@ -81,111 +97,13 @@ Vector KNNClassifier::predict(Matrix X)
         occurrences[8] = 0;
         occurrences[9] = 0;
 
-        int lower_index = nearest_index - 1;
-        int above_index = nearest_index + 1;
-        int n_neighbors_counted = 1 ;
-        occurrences[get<1>(images_norm[nearest_index])] = 1 ;
-        outfile << get<1>(images_norm[nearest_index]) << std::endl;
-        while(n_neighbors_counted < this->_n_neighbors){
-
-            if(lower_index < 0 && above_index > images_norm.size()){break;}
-            else if(lower_index < 0){
-                occurrences[get<1>(images_norm[above_index])] = occurrences[get<1>(images_norm[above_index])] + 1;
-                outfile << get<1>(images_norm[above_index]) << std::endl;
-
-                above_index++;
-            }
-            else if(above_index > images_norm.size()){
-                occurrences[get<1>(images_norm[lower_index])] = occurrences[get<1>(images_norm[lower_index])] + 1;
-                outfile << get<1>(images_norm[lower_index]) << std::endl;
-                lower_index--;
-            }
-            else{
-                outfile << ":" << lower_index << ' ' <<get<0>(images_norm[lower_index]) << ' ' << abs(get<0>(images_norm[lower_index])-norma) << ' ' << above_index << ' ' <<get<0>(images_norm[above_index]) << ' ' << abs(get<0>(images_norm[above_index])-norma) << std::endl;
-                if(abs(get<0>(images_norm[lower_index])-norma) < abs(get<0>(images_norm[above_index])-norma)){
-                    occurrences[get<1>(images_norm[lower_index])] = occurrences[get<1>(images_norm[lower_index])] + 1;
-                    outfile << get<1>(images_norm[lower_index]) << std::endl;
-                    lower_index--;
-                }
-                else{
-                    occurrences[get<1>(images_norm[above_index])] = occurrences[get<1>(images_norm[above_index])] + 1;
-                    outfile << get<1>(images_norm[above_index]) << std::endl;
-                    above_index++;
-
-                }
-            }
-            n_neighbors_counted++;
+        for (int i = 0; i < this->_n_neighbors; i++) {
+            occurrences[get<1>(images_norm[i])] = occurrences[get<1>(images_norm[i])] + 1;
         }
-        outfile << n_neighbors_counted << std::endl;
-
-        // Me fijo cual tiene mayoria
-        int max_index = 0;
-        int max_occurrences = 0 ;
-        for(int i=0;i<=9;i++){
-            if(occurrences[i] > max_occurrences){
-                max_index = i;
-                max_occurrences=occurrences[i];
-            }
-        }
-        for(int i=0;i<=9;i++){
-            outfile << i << ':'<< occurrences[i] << std::endl;
-        }
-        // Pongo en vector
-        ret(k) = max_index;
+        images_norm.clear();
+        auto max = get_max(occurrences);
+        ret(k) = max.first;
     }
-    outfile.close();
     return ret;
-
-
-}
-
-
-
-
-int KNNClassifier::nearest_element_index( vector<tuple<double ,int >> arr, int l, int r, double x)
-{
-    std::ofstream outfile ("m.txt");
-
-    int m = l + (r - l) / 2;
-    int counter = 0 ;
-    while (l <= r && counter < 100) {
-        counter++;
-        m = l + (r - l) / 2;
-        outfile << m << std::endl;
-
-        // Check if x is present at mid
-        if (get<0>(arr[m]) == x)
-            return m;
-  
-        // If x greater, ignore left half
-        if (get<0>(arr[m]) < x)
-            l = m + 1;
-  
-        // If x is smaller, ignore right half
-        else
-            r = m - 1;
-    }
-  
-    if(m == 0){
-       double  below_diff =  abs(x-get<0>(arr[0]));
-       double  middle_diff = abs(x-get<0>(arr[1]));
-       outfile.close();
-       return (below_diff < middle_diff) ? 0 : 1 ;
-       
-        }
-    else if(m  == arr.size()){
-       double  below_diff =  abs(x-get<0>(arr[m-1]));
-       double middle_diff = abs(x-get<0>(arr[m-2]));
-       outfile.close();
-       return  (below_diff < middle_diff) ? m-1  : m-2;
-    }
-    
-    else {
-        double below_diff =  abs(x-get<0>(arr[m-1]));
-        double middle_diff = abs(x-get<0>(arr[m]));
-        double above_diff = abs(x-get<0>(arr[m+1]));
-        outfile.close();
-        return (below_diff < middle_diff) ? m-1 :  (above_diff < middle_diff) ? m+1 : m  ;
-        }
 }
 

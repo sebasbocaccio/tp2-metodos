@@ -1,0 +1,20 @@
+3 2Las diferencias de las normas y la categoria son: 
+Norma: 1Categoria :1
+Norma: 64Categoria :2
+Norma: 9Categoria :3
+Vecino mas cercano 0es1
+Vecino mas cercano 1es3
+Vecino mas cercano 2es2
+
+
+Norma: 226Categoria :1
+Norma: 325Categoria :2
+Norma: 250Categoria :3
+Vecino mas cercano 0es1
+Vecino mas cercano 1es3
+Vecino mas cercano 2es2
+
+
+Norma: 9Categoria :1
+Norma: 36Categoria :2
+Norma: 1Categoria :3
