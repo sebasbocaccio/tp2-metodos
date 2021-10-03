@@ -11,7 +11,7 @@ public:
 
     void fit(Matrix X, Matrix y);
     std::vector<tuple<Eigen::VectorXd, int>> retrieve_matrix_from_file(string file);
-
+    vector<tuple<double, int>> vecinos_ordenados_por_distancia(Matrix &X,std::vector<tuple<Eigen::VectorXd, int>> &imagenes,int indice_imagen);
     Vector predict(Matrix X);
 private:
     unsigned int _n_neighbors;
