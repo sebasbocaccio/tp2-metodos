@@ -26,7 +26,7 @@ int main(int argc, char** argv){
             {15, 0},
             {0,4}}
     ;
-
+    
     knn.predict(x_test);
     return 0;
 }
