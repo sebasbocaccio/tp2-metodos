@@ -3,7 +3,7 @@
 #include "knn.h"
 #include "pca.h"
 #include "eigen.h"
-#include <fstream>
+
 namespace py=pybind11;
 
 // el primer argumento es el nombre...
@@ -13,10 +13,10 @@ PYBIND11_MODULE(metnum, m) {
         .def("fit", &KNNClassifier::fit)
         .def("predict", &KNNClassifier::predict);
 
-
     py::class_<PCA>(m, "PCA")
         .def(py::init<unsigned int>())
         .def("fit", &PCA::fit)
+        .def("componentesPrincipales", &PCA::componentesPrincipales)
         .def("transform", &PCA::transform);
     m.def(
         "power_iteration", &power_iteration,

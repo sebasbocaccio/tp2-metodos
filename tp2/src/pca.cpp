@@ -5,47 +5,45 @@
 using namespace std;
 
 
-PCA::PCA(unsigned int n_components)
-{
-  _n_components = n_components;
+PCA::PCA(unsigned int n_components) {
+    this->_n_components = n_components;
 }
 
-void PCA::fit(Matrix &X)
-{
-  Vector mean(X.cols());
+void PCA::fit(Matrix X) {
+    _X = X;
+    vector<double> promedios;
+    double suma;
+    for (int i=0; i<X.cols(); i++) {
+        suma = 0;
+        for (int j=0; j<X.rows(); j++) {
+            suma = suma + X(j,i);
+        }
+        promedios.push_back(suma/X.rows());
+    }
 
-  for (int i = 0; i < X.rows(); ++i)
-  {
-      for (int j = 0; j < X.row(0).size(); ++j)
-      {
-          mean(j) = mean(j) + X.row(i)(j);
-      }
-  }
-
-  mean = mean / X.rows();
-
-  Matrix means(X.rows(),X.cols());
-  for(int i=0; i < X.rows(); i++)
-  {
-      for (int j = 0; j < mean.size(); ++j)
-      {
-          means.row(i)(j) = mean (j);
-      }
-  }
-  Matrix Y = X - means;
-
-  Matrix CovMatrix = (Y.transpose() * Y) / (Y.rows()-1); 
-
-  X = get_first_eigenvalues(CovMatrix, X.rows(), 1000, 1e-16).second;
+    for (int i=0; i<X.cols(); i++) {
+        for (int j=0; j<X.rows(); j++) {
+            _X(j,i) = (_X(j,i) - promedios[i])/(sqrt(X.rows() - 1));
+        }
+    }
 
 }
 
 
-MatrixXd PCA::transform(Matrix X)
-{
-  Matrix Y(X);
-  this->fit(X);
-  return X*Y;
+MatrixXd PCA::transform(Matrix X) {
+  fit(X);
+  X = _X;
+  Matrix Xt = X.transpose();
+  Matrix Cov = Xt * X;
 
-  //throw std::runtime_error("Sin implementar");
+  pair<Vector, Matrix> eigen = get_first_eigenvalues(Cov, _n_components, 5000);
+
+  Matrix V = eigen.second;
+  _componentesPrincipales = V;
+
+  return X * V;
+}
+
+Matrix PCA::componentesPrincipales() {
+    return _componentesPrincipales;
 }
