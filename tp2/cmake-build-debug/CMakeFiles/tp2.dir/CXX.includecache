@@ -1568,21 +1568,25 @@ IndexedViewMethods.h
 ReshapedMethods.h
 ../eigen/Eigen/src/plugins/ReshapedMethods.h
 
-/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/eigen.h
-types.h
-/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/types.h
-
-/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/main.cpp
+/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/knn.cpp
+algorithm
+-
 iostream
 -
-pca.h
-/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/pca.h
-eigen.h
-/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/eigen.h
+knn.h
+/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/knn.h
+fstream
+-
+iostream
+-
+fstream
+-
 
-/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/pca.h
+/home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/knn.h
 types.h
 /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/types.h
+fstream
+-
 
 /home/sebasbocaccio/Desktop/FACU/Metodos/tp2-metodos/tp2/src/types.h
 Eigen/Sparse
