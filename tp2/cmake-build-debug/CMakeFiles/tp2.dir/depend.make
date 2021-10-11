@@ -914,8 +914,8 @@ CMakeFiles/tp2.dir/src/main.cpp.o: \
  ../eigen/Eigen/src/plugins/MatrixCwiseUnaryOps.h \
  ../eigen/Eigen/src/plugins/ReshapedMethods.h \
  ../src/eigen.h \
- ../src/knn.h \
  ../src/main.cpp \
+ ../src/pca.h \
  ../src/types.h
 CMakeFiles/tp2.dir/src/pca.cpp.o: \
  ../eigen/Eigen/Cholesky \
