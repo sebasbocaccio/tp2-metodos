@@ -19,12 +19,10 @@ void KNNClassifier::fit(Matrix &X, Matrix &y) {
     for (unsigned k = 0; k < X.rows(); ++k) {
         auto image_pixels = Eigen::VectorXd(X.cols());
         for (unsigned j = 0; j < X.cols(); ++j) {
-            image_pixels[j] = X(k, j);
-            outfile << image_pixels[j] << ' ';
+            outfile << X(k, j) << ' ';
         }
         outfile << y(k, 0) << std::endl;
     }
-
     outfile.close();
 
 }
@@ -38,17 +36,21 @@ std::pair<KeyType, ValueType> get_max(const std::map<KeyType, ValueType> &x) {
 }
 
 Vector KNNClassifier::predict(Matrix &X) {
-    std::vector<tuple<Eigen::VectorXd, int>> imagenes = this->retrieve_matrix_from_file("imagenes.txt");
+    if(this->imagenes.empty()) {
+        this->retrieve_matrix_from_file("imagenes.txt");
+    }
+
     auto prediccion_categoria = Vector(X.rows());
     for (unsigned k = 0; k < X.rows(); ++k) {
-        vector<tuple<double, int>> vecinos_ordenados = this->neighbours_sorted_by_distance(X, imagenes,k);
-        uint categoria_imagen = this->majority_category(vecinos_ordenados,this->_n_neighbors);
+        vector<tuple<double, int>>* vecinos_ordenados = this->neighbours_sorted_by_distance(X, this->imagenes,k);
+        uint categoria_imagen = this->majority_category(*vecinos_ordenados,this->_n_neighbors);
         prediccion_categoria(k) = categoria_imagen;
+        delete vecinos_ordenados;
     }
     return prediccion_categoria;
 }
 
-std::vector<tuple<Eigen::VectorXd, int>> KNNClassifier::retrieve_matrix_from_file(string file) {
+void KNNClassifier::retrieve_matrix_from_file(string file) {
     std::ifstream ifs(file);
     std::vector<tuple<Eigen::VectorXd, int>> imagenes;
     double number;
@@ -70,28 +72,26 @@ std::vector<tuple<Eigen::VectorXd, int>> KNNClassifier::retrieve_matrix_from_fil
         }
         int category;
         iss >> category;
-        imagenes.push_back(make_tuple(image_pixels, category));
+        this->imagenes.push_back(make_tuple(image_pixels, category));
     }
     ifs.close();
-    return imagenes;
 }
 
-vector<tuple<double, int>>
+vector<tuple<double, int>>*
 KNNClassifier::neighbours_sorted_by_distance(Matrix &X, std::vector<tuple<Eigen::VectorXd, int>> &imagenes,
                                              int indice_imagen) {
-    vector<tuple<double, int>> images_norm;
-    std::vector<tuple<Eigen::VectorXd, int>> copy_imagenes = imagenes;
+    vector<tuple<double, int>>* images_norm = new vector<tuple<double, int>>;
     for (int i = 0; i < imagenes.size(); i++) {
         auto image_pixels = Eigen::VectorXd(X.cols());
         for (unsigned j = 0; j < X.cols(); ++j) {
-            double numero = get<0>(copy_imagenes[i])[j] - X(indice_imagen, j);
+            double numero = get<0>(imagenes[i])[j] - X(indice_imagen, j);
             image_pixels[j] = numero;
         }
         double norma = image_pixels.squaredNorm();
-        images_norm.push_back(make_tuple(norma, get<1>(copy_imagenes[i])));
+        images_norm->push_back(make_tuple(norma, get<1>(imagenes[i])));
     }
-    // Sorteo por errores y devuelvo los primeros k.
-    sort(images_norm.begin(), images_norm.end());
+
+    sort(images_norm->begin(), images_norm->end());
     return images_norm;
 }
 
@@ -114,4 +114,7 @@ int KNNClassifier::majority_category(vector<tuple<double, int>> &vecinos, uint c
     }
     auto max = get_max(occurrences);
     return max.first;
+}
+void  KNNClassifier::change_k(unsigned int n_neighbors){
+    this->_n_neighbors = n_neighbors;
 }

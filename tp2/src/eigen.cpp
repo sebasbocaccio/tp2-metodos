@@ -11,8 +11,10 @@ pair<double, Vector> power_iteration(const Matrix& X, unsigned num_iter, double 
     double eigenvalue;
 
     for (int i=0; i<num_iter; i++) {
+        Vector b_anterior = b;
         b = X*b;
         b = b/b.norm();
+        if(b_anterior == b) break;
     }
 
     eigenvalue = (b.transpose() * (X*b));
