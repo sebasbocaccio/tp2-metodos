@@ -24,7 +24,7 @@ void KNNClassifier::fit(Matrix &X, Matrix &y) {
         outfile << y(k, 0) << std::endl;
     }
     outfile.close();
-
+    this->imagenes.clear();
 }
 
 template<typename KeyType, typename ValueType>
