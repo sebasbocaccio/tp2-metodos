@@ -13,8 +13,9 @@ KNNClassifier::KNNClassifier(unsigned int n_neighbors) {
     this->_n_neighbors = n_neighbors;
 }
 
-void KNNClassifier::fit(Matrix &X, Matrix &y) {
-    std::ofstream outfile("imagenes.txt");
+void KNNClassifier::fit(Matrix &X, Matrix &y, string matrix_saving_name = "knn_matrix.txt") {
+    this->image_name = matrix_saving_name;
+    std::ofstream outfile(matrix_saving_name);
     outfile << X.rows() << ' ' << X.cols() << std::endl;
     for (unsigned k = 0; k < X.rows(); ++k) {
         auto image_pixels = Eigen::VectorXd(X.cols());
@@ -37,7 +38,7 @@ std::pair<KeyType, ValueType> get_max(const std::map<KeyType, ValueType> &x) {
 
 Vector KNNClassifier::predict(Matrix &X) {
     if(this->imagenes.empty()) {
-        this->retrieve_matrix_from_file("imagenes.txt");
+        this->retrieve_matrix_from_file(this->image_name);
     }
 
     auto prediccion_categoria = Vector(X.rows());
@@ -101,7 +102,13 @@ int KNNClassifier::majority_category(vector<tuple<double, int>> &vecinos, uint c
     for (int i = 0; i < cant_vecinos; i++) {
         occurrences[get<1>(vecinos[i])] = occurrences[get<1>(vecinos[i])] + 1;
     }
-    int maxElementIndex = distance(occurrences.begin(), std::max_element(occurrences.begin(), occurrences.end()));
+    int maxElementIndex = 0;
+    int maxElementCount = 0;
+    for (int i = 0; i < occurrences.size(); i++) {
+        if(occurrences[i] > maxElementCount) {
+            maxElementIndex = i;
+        }
+    }
     return maxElementIndex;
 }
 void  KNNClassifier::change_k(unsigned int n_neighbors){
