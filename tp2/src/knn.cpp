@@ -97,23 +97,12 @@ KNNClassifier::neighbours_sorted_by_distance(Matrix &X, std::vector<tuple<Eigen:
 
 
 int KNNClassifier::majority_category(vector<tuple<double, int>> &vecinos, uint cant_vecinos) {
-    map<int, int> occurrences;
-    occurrences[0] = 0;
-    occurrences[1] = 0;
-    occurrences[2] = 0;
-    occurrences[3] = 0;
-    occurrences[4] = 0;
-    occurrences[5] = 0;
-    occurrences[6] = 0;
-    occurrences[7] = 0;
-    occurrences[8] = 0;
-    occurrences[9] = 0;
-
+    std::vector<int> occurrences(10, 0);
     for (int i = 0; i < cant_vecinos; i++) {
         occurrences[get<1>(vecinos[i])] = occurrences[get<1>(vecinos[i])] + 1;
     }
-    auto max = get_max(occurrences);
-    return max.first;
+    int maxElementIndex = distance(occurrences.begin(), std::max_element(occurrences.begin(), occurrences.end()));
+    return maxElementIndex;
 }
 void  KNNClassifier::change_k(unsigned int n_neighbors){
     this->_n_neighbors = n_neighbors;
