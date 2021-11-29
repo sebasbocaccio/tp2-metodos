@@ -14,7 +14,7 @@ pair<double, Vector> power_iteration(const Matrix& X, unsigned num_iter, double 
         Vector b_anterior = b;
         b = X*b;
         b = b/b.norm();
-        if(b_anterior == b) break;
+        if((b_anterior - b).norm() <= eps ) break;
     }
 
     eigenvalue = (b.transpose() * (X*b));
